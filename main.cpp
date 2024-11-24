@@ -13,12 +13,12 @@ struct Boid
     float maxSpeed = 8.0;
     float minSpeed = 5.0;
 
-    float separation = 0.5;
+    float separation = 0.2;
     float alignment = 0.2;
     float cohesion = 0.0005;
 
     float visionRadius = 50.0;
-    float protectedRadius = 10.0;
+    float separationRadius = 10.0;
 
     float edgeMargin = 100.0;
     float edgeTurnSpeed = 0.5;
@@ -26,9 +26,9 @@ struct Boid
 
 int main()
 {
-    InitWindow(1000, 600, "Boids Improved!");
+    InitWindow(1200, 700, "Boids Improved!");
 
-    Boid boids[300];
+    Boid boids[500];
 
     bool debugLines = false;
     bool avoidWalls = true;
@@ -83,7 +83,7 @@ int main()
                     Vector2 dxn = Vector2Subtract(boid.position, other.position);
                     float dist = Vector2Distance(boid.position, other.position);
                     
-                    if (dist < boid.protectedRadius)
+                    if (dist < boid.separationRadius)
                     {
                         close = Vector2Add(close, dxn);
                     }
@@ -113,7 +113,10 @@ int main()
             }
 
             // Separation
-            boid.velocity = Vector2Add(boid.velocity, close);
+            boid.velocity = Vector2Add(
+                    boid.velocity, 
+                    (Vector2){close.x * boid.separation, close.y * boid.separation}
+                    );
 
             // Alignment
             if (intersectingBoids > 0)
@@ -193,6 +196,10 @@ int main()
         BeginDrawing();
         ClearBackground(LIGHTGRAY);
 
+        // UI
+        DrawText("BOIDS", 20, 20, 20, GRAY);
+        DrawText("I'm Awesome!", GetScreenWidth() - 70, GetScreenHeight() - 20, 10, GRAY);
+        
         for (auto &boid : boids)
         {
             DrawRectangle(
@@ -219,7 +226,7 @@ int main()
                     DrawCircleLines(
                             boid.position.x + boid.size.x / 2, 
                             boid.position.y + boid.size.y / 2, 
-                            boid.protectedRadius, 
+                            boid.separationRadius, 
                             RED
                         );
                 }
