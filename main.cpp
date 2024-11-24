@@ -70,6 +70,10 @@ int main()
 
             boid.velocity = Vector2Clamp(boid.velocity, (Vector2){boid.minSpeed, boid.minSpeed}, (Vector2){boid.maxSpeed, boid.maxSpeed});
 
+            Vector2 avgVel = (Vector2){0, 0};
+            Vector2 totalVel = (Vector2){0, 0};
+            int intersectingBoids = 0;
+
             // Vision Radius
             for (auto &other : boids)
             {
@@ -91,9 +95,18 @@ int main()
 
 
                     // Alignment
+                    intersectingBoids += 1;
+                    totalVel = Vector2Add(totalVel, other.velocity);
+                    
                     // Cohesion
                 }
             }
+
+            // Alignment
+            avgVel = (Vector2){totalVel.x / intersectingBoids, totalVel.y / intersectingBoids};
+            avgVel = Vector2Normalize(avgVel);
+
+            boid.velocity = Vector2Add(boid.velocity, (Vector2){avgVel.x * boid.alignment, avgVel.y * boid.alignment});
         }
     
         // Draw
