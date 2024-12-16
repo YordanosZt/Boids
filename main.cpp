@@ -1,6 +1,7 @@
 #include <cmath>
 #include <raylib.h>
 #include <raymath.h>
+#include <string>
 
 struct Boid
 {
@@ -13,7 +14,7 @@ struct Boid
     float maxSpeed = 8.0;
     float minSpeed = 5.0;
 
-    float separation = 0.2;
+    float separation = 0.5;
     float alignment = 0.2;
     float cohesion = 0.0005;
 
@@ -26,9 +27,12 @@ struct Boid
 
 int main()
 {
-    InitWindow(1200, 700, "Boids Improved!");
+    int display = GetCurrentMonitor();
+    
+    //InitWindow(1000, 600, "Boids");
+    InitWindow(GetMonitorWidth(display), GetMonitorHeight(display), "Boids");
 
-    Boid boids[500];
+    Boid boids[700];
 
     bool debugLines = false;
     bool avoidWalls = true;
@@ -44,7 +48,6 @@ int main()
             (float)GetRandomValue(0, GetScreenHeight() - boid.size.y)
         };
 
-        //boid.velocity = (Vector2){(float)GetRandomValue(-400, 400), (float)GetRandomValue(-400, 400)};
         boid.index = index;
 
         index++;
@@ -55,6 +58,9 @@ int main()
     while (WindowShouldClose() == false) 
     {
         // Update
+        if (IsKeyPressed(KEY_W))
+            avoidWalls = !avoidWalls;
+
         for (auto &boid : boids)
         { 
             // Separation
@@ -199,15 +205,19 @@ int main()
         // UI
         DrawText("BOIDS", 20, 20, 20, GRAY);
         DrawText("I'm Awesome!", GetScreenWidth() - 70, GetScreenHeight() - 20, 10, GRAY);
+
+        std::string avoidWallsText = "Avoid Walls: " + std::to_string(avoidWalls);
+        DrawText(avoidWallsText.c_str(), 20, GetScreenHeight() - 40, 20, GRAY);
         
         for (auto &boid : boids)
         {
+            // Boid
             DrawRectangle(
                     boid.position.x, 
                     boid.position.y, 
                     boid.size.x, 
                     boid.size.y,
-                    RED
+                    BLUE
                 );
 
             if (debugLines)
